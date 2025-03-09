@@ -53,7 +53,7 @@ for (const file of msgCommandFiles) {
     const hasDefaultExport = Object.keys(command).includes('default');
 
     if (hasDefaultExport) {
-        client.msgCommands.set(command.name, command.default);
+        client.msgCommands.set(command.default.name, command.default);
     } else {
         for (const cmd of command.commands) {
             client.msgCommands.set(cmd.data.name, cmd);

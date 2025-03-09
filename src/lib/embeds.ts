@@ -1,4 +1,4 @@
-import { type BaseInteraction, EmbedBuilder } from 'discord.js';
+import { type BaseInteraction, EmbedBuilder, type Message } from 'discord.js';
 
 const colors = {
     error: 0xff2056,
@@ -8,14 +8,21 @@ const colors = {
     neutral: 0x808080
 };
 
-export const createEmbed = (
+export const createEmbed = <T extends 'inter' | 'text'>(
     type: keyof typeof colors,
-    interaction: BaseInteraction
-) =>
-    new EmbedBuilder()
+    _type: T,
+    _inter: T extends 'inter' ? BaseInteraction : Message<any>
+) => {
+    const user =
+        _type === 'inter'
+            ? (_inter as BaseInteraction).user
+            : (_inter as Message<any>).author;
+
+    return new EmbedBuilder()
         .setColor(colors[type])
         .setTimestamp()
         .setFooter({
-            text: interaction.user.tag ?? 'unknown',
-            iconURL: (interaction.user.avatarURL() ?? undefined) as string
+            text: user.tag ?? 'unknown',
+            iconURL: (user.avatarURL() ?? undefined) as string
         });
+};

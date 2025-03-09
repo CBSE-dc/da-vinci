@@ -1,8 +1,8 @@
 import { Events, type Message } from 'discord.js';
 import Event from '../templates/Event.js';
 import type MessageCommand from '../templates/MessageCommand.js';
-
-const PREFIX = ';';
+import { logger } from '../lib/logger.js';
+import { PREFIX } from '../lib/constants.js';
 
 export default new Event({
     name: Events.MessageCreate,
@@ -33,7 +33,7 @@ export default new Event({
         try {
             await command.execute(message, args);
         } catch (error) {
-            console.error(error);
+            logger.error(error);
         }
     }
 });

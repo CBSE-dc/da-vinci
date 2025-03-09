@@ -1,11 +1,12 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { getImages, rotate } from '../lib/images.js';
 import MessageCommand from '../templates/MessageCommand.js';
+import { createEmbed } from '../lib/embeds.js';
 
 export default new MessageCommand({
     name: 'rotate',
     description: 'Rotate an image',
-    aliases: ['rt'],
+    aliases: ['rotate', 'rt'],
     async execute(message, args) {
         const repliedId = message.reference?.messageId;
 
@@ -55,7 +56,13 @@ export default new MessageCommand({
                 components: [row]
             });
         } catch (error) {
-            await message.reply('An error occurred while rotating the image');
+            await message.reply({
+                embeds: [
+                    createEmbed('error', 'text', message).setDescription(
+                        'An error occurred while rotating the image'
+                    )
+                ]
+            });
         }
     }
 });

@@ -22,7 +22,7 @@ export default new ApplicationCommand({
         if (!hasImage) {
             await interaction.editReply({
                 embeds: [
-                    createEmbed('error', interaction).setDescription(
+                    createEmbed('error', 'inter', interaction).setDescription(
                         'You need to provide an image to rotate.'
                     )
                 ]
@@ -49,7 +49,7 @@ export default new ApplicationCommand({
         } catch (error) {
             await interaction.editReply({
                 embeds: [
-                    createEmbed('error', interaction).setDescription(
+                    createEmbed('error', 'inter', interaction).setDescription(
                         'Failed to rotate the image.'
                     )
                 ]

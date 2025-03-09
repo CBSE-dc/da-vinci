@@ -24,7 +24,11 @@ export default (angle: number) =>
             if (!hasImage) {
                 await interaction.editReply({
                     embeds: [
-                        createEmbed('error', interaction).setDescription(
+                        createEmbed(
+                            'error',
+                            'inter',
+                            interaction
+                        ).setDescription(
                             'You need to provide an image to rotate.'
                         )
                     ]
@@ -62,9 +66,11 @@ export default (angle: number) =>
                 if (!attachment) {
                     await interaction.editReply({
                         embeds: [
-                            createEmbed('error', interaction).setDescription(
-                                'Failed to fetch the image.'
-                            )
+                            createEmbed(
+                                'error',
+                                'inter',
+                                interaction
+                            ).setDescription('Failed to fetch the image.')
                         ]
                     });
                     return;
@@ -78,9 +84,11 @@ export default (angle: number) =>
             } catch (error) {
                 await interaction.editReply({
                     embeds: [
-                        createEmbed('error', interaction).setDescription(
-                            'Failed to rotate the image.'
-                        )
+                        createEmbed(
+                            'error',
+                            'inter',
+                            interaction
+                        ).setDescription('Failed to rotate the image.')
                     ]
                 });
             }

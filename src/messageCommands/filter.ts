@@ -2,11 +2,12 @@ import { AttachmentBuilder } from 'discord.js';
 import { getImages } from '../lib/images.js';
 import MessageCommand from '../templates/MessageCommand.js';
 import sharp from 'sharp';
+import { createEmbed } from '../lib/embeds.js';
 
 export default new MessageCommand({
     name: 'blackwhite',
     description: 'Apply a black and white filter to an image',
-    aliases: ['bw'],
+    aliases: ['blackwhite', 'bw'],
     async execute(message) {
         const repliedId = message.reference?.messageId;
 
@@ -38,7 +39,13 @@ export default new MessageCommand({
                 files: [attachment]
             });
         } catch (error) {
-            await message.reply('An error occurred while applying filter');
+            await message.reply({
+                embeds: [
+                    createEmbed('error', 'text', message).setDescription(
+                        "'An error occurred while applying filter'"
+                    )
+                ]
+            });
         }
     }
 });

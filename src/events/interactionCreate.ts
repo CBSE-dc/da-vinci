@@ -1,6 +1,8 @@
 import { type BaseInteraction, Events } from 'discord.js';
 import Event from '../templates/Event.js';
 import type ApplicationCommand from '../templates/ApplicationCommand.js';
+import { createEmbed } from '../lib/embeds.js';
+import { logger } from '../lib/logger.js';
 
 export default new Event({
     name: Events.InteractionCreate,
@@ -16,12 +18,19 @@ export default new Event({
                 )) as ApplicationCommand;
 
                 if (!command.execute) {
-                    console.error(
+                    logger.error(
                         `Failed to find execution handler for ${command.data.name}`
                     );
                     await interaction.reply({
-                        content:
-                            'There was an error while executing this command!',
+                        embeds: [
+                            createEmbed(
+                                'error',
+                                'inter',
+                                interaction
+                            ).setDescription(
+                                'There was an error while executing this command!'
+                            )
+                        ],
                         ephemeral: true
                     });
                     return;
@@ -29,9 +38,17 @@ export default new Event({
 
                 await command.execute(interaction);
             } catch (error) {
-                console.error(error);
+                logger.error(error);
                 await interaction.reply({
-                    content: 'There was an error while executing this command!',
+                    embeds: [
+                        createEmbed(
+                            'error',
+                            'inter',
+                            interaction
+                        ).setDescription(
+                            'There was an error while executing this command!'
+                        )
+                    ],
                     ephemeral: true
                 });
             }
@@ -44,7 +61,7 @@ export default new Event({
                 )) as ApplicationCommand;
 
                 if (!command.autocomplete) {
-                    console.error(
+                    logger.error(
                         `Failed to find autocomplete handler for ${command.data.name}`
                     );
                     await interaction.respond([
@@ -53,12 +70,13 @@ export default new Event({
                             value: 'error'
                         }
                     ]);
+
                     return;
                 }
 
                 await command.autocomplete(interaction);
             } catch (error) {
-                console.error(error);
+                logger.error(error);
             }
         }
     }

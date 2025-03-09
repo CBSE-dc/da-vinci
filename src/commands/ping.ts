@@ -8,9 +8,11 @@ export default new ApplicationCommand({
         .setDescription('Replies pong!'),
     async execute(interaction): Promise<void> {
         const latency = Date.now() - interaction.createdTimestamp;
-        const embed = createEmbed('success', interaction).setDescription(
-            `🏓 Pong! Latency is ${latency}ms.`
-        );
+        const embed = createEmbed(
+            'success',
+            'inter',
+            interaction
+        ).setDescription(`🏓 Pong! Latency is ${latency}ms.`);
 
         await interaction.reply({
             embeds: [embed]

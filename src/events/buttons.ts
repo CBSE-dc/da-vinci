@@ -1,6 +1,8 @@
 import { type BaseInteraction, Events } from 'discord.js';
 import Event from '../templates/Event.js';
 import { getImages, rotate } from '../lib/images.js';
+import { createEmbed } from '../lib/embeds.js';
+import { logger } from '../lib/logger.js';
 
 export default new Event({
     name: Events.InteractionCreate,
@@ -12,7 +14,15 @@ export default new Event({
         try {
             if (!interaction.customId.endsWith(interaction.user.id)) {
                 await interaction.followUp({
-                    content: `This button is not for you! <@${interaction.user.id}>`,
+                    embeds: [
+                        createEmbed(
+                            'error',
+                            'inter',
+                            interaction
+                        ).setDescription(
+                            `This button is not for you! <@${interaction.user.id}>`
+                        )
+                    ],
                     flags: ['Ephemeral']
                 });
                 return;
@@ -46,7 +56,7 @@ export default new Event({
                 });
             }
         } catch (error) {
-            console.error(error);
+            logger.error(error);
         }
     }
 });
