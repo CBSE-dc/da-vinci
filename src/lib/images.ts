@@ -2,6 +2,7 @@ import { AttachmentBuilder, type Message } from 'discord.js';
 import sharp from 'sharp';
 
 interface AttachmentType {
+    name: string;
     type: string;
     url: string;
     source?: string;
@@ -17,6 +18,7 @@ export const getImages = (message: Message) => {
         .map(
             (v) =>
                 ({
+                    name: v.name,
                     type: 'attachment',
                     url: v.url,
                     source: 'image'
@@ -24,9 +26,10 @@ export const getImages = (message: Message) => {
         );
     const otherAttachments = new Array<AttachmentType>();
 
-    message.embeds.map((embed) => {
+    (message.embeds ?? []).map((embed) => {
         if (embed.image) {
             otherAttachments.push({
+                name: Math.random().toString(36).substring(7),
                 type: 'embed-image',
                 url: embed.image.url,
                 source: 'image'
@@ -36,6 +39,7 @@ export const getImages = (message: Message) => {
         // Check for thumbnail in embed
         if (embed.thumbnail) {
             otherAttachments.push({
+                name: Math.random().toString(36).substring(7),
                 type: 'embed-thumbnail',
                 url: embed.thumbnail.url,
                 source: 'thumbnail'
@@ -46,14 +50,25 @@ export const getImages = (message: Message) => {
     return attachments.concat(otherAttachments);
 };
 
-export const rotate = async (img: AttachmentType, angle: number) => {
-    const fetched = await fetch(img.url);
+export const fetchImage = async (img: string) => {
+    const fetched = await fetch(img);
     const imgBlob = fetched.ok ? await fetched.blob() : null;
 
     if (!imgBlob) return;
 
-    const buffer = Buffer.from(await imgBlob.arrayBuffer());
-    const rotated = await sharp(buffer).rotate(angle).toBuffer();
+    return {
+        getBuffer: async () => Buffer.from(await imgBlob.arrayBuffer()),
+        blob: imgBlob
+    };
+};
+
+export const rotate = async (img: AttachmentType, angle: number) => {
+    const fetched = await fetchImage(img.url);
+    if (!fetched) return;
+
+    const rotated = await sharp(await fetched.getBuffer())
+        .rotate(angle)
+        .toBuffer();
 
     return new AttachmentBuilder(rotated, {
         name: 'rotated.png'

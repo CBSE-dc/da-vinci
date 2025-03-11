@@ -14,12 +14,30 @@ export default new MessageCommand({
             ? await message.channel.messages.fetch(repliedId)
             : null;
 
-        if (!fetchedMessage) return;
+        if (!fetchedMessage) {
+            await message.reply({
+                embeds: [
+                    createEmbed('error', 'text', message).setDescription(
+                        'No image found in the replied message.'
+                    )
+                ]
+            });
+            return;
+        }
 
         const attachments = getImages(fetchedMessage);
         const image = attachments[0];
 
-        if (!image) return;
+        if (!image) {
+            await message.reply({
+                embeds: [
+                    createEmbed('error', 'text', message).setDescription(
+                        'No image found in the replied message.'
+                    )
+                ]
+            });
+            return;
+        }
 
         const angle = Number.parseInt(args[0] ?? '-90');
 

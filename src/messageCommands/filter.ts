@@ -1,5 +1,5 @@
 import { AttachmentBuilder } from 'discord.js';
-import { getImages } from '../lib/images.js';
+import { fetchImage, getImages } from '../lib/images.js';
 import MessageCommand from '../templates/MessageCommand.js';
 import sharp from 'sharp';
 import { createEmbed } from '../lib/embeds.js';
@@ -15,21 +15,47 @@ export default new MessageCommand({
             ? await message.channel.messages.fetch(repliedId)
             : null;
 
-        if (!fetchedMessage) return;
+        if (!fetchedMessage) {
+            await message.reply({
+                embeds: [
+                    createEmbed('error', 'text', message).setDescription(
+                        'No image found in the replied message.'
+                    )
+                ]
+            });
+            return;
+        }
 
         const attachments = getImages(fetchedMessage);
         const image = attachments[0];
 
-        if (!image) return;
+        if (!image) {
+            await message.reply({
+                embeds: [
+                    createEmbed('error', 'text', message).setDescription(
+                        'No image found in the replied message.'
+                    )
+                ]
+            });
+            return;
+        }
 
         try {
-            const fetched = await fetch(image.url);
-            const imgBlob = fetched.ok ? await fetched.blob() : null;
+            const fetched = await fetchImage(image.url);
+            if (!fetched) {
+                await message.reply({
+                    embeds: [
+                        createEmbed('error', 'text', message).setDescription(
+                            'Failed to fetch the image.'
+                        )
+                    ]
+                });
+                return;
+            }
 
-            if (!imgBlob) return;
-
-            const buffer = Buffer.from(await imgBlob.arrayBuffer());
-            const bw = await sharp(buffer).grayscale().toBuffer();
+            const bw = await sharp(await fetched.getBuffer())
+                .grayscale()
+                .toBuffer();
             const attachment = new AttachmentBuilder(bw, {
                 name: 'bw.png'
             });

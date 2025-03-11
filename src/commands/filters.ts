@@ -5,7 +5,7 @@ import {
 } from 'discord.js';
 import ApplicationCommand from '../templates/ApplicationCommand.js';
 import { createEmbed } from '../lib/embeds.js';
-import { getImages } from '../lib/images.js';
+import { fetchImage, getImages } from '../lib/images.js';
 import sharp from 'sharp';
 
 export default new ApplicationCommand({
@@ -32,13 +32,23 @@ export default new ApplicationCommand({
 
         const image = images[0]!;
         try {
-            const fetched = await fetch(image.url);
-            const imgBlob = fetched.ok ? await fetched.blob() : null;
+            const fetched = await fetchImage(image.url);
+            if (!fetched) {
+                await interaction.editReply({
+                    embeds: [
+                        createEmbed(
+                            'error',
+                            'inter',
+                            interaction
+                        ).setDescription('Failed to fetch the image.')
+                    ]
+                });
+                return;
+            }
 
-            if (!imgBlob) return;
-
-            const buffer = Buffer.from(await imgBlob.arrayBuffer());
-            const bw = await sharp(buffer).grayscale().toBuffer();
+            const bw = await sharp(await fetched.getBuffer())
+                .grayscale()
+                .toBuffer();
             const attachment = new AttachmentBuilder(bw, {
                 name: 'bw.png'
             });
