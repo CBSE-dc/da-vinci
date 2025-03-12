@@ -15,8 +15,14 @@ await deployGlobalCommands();
 // client setup
 global.client = Object.assign(
     new Client({
-        intents: ['Guilds', 'GuildMessages', 'MessageContent'],
-        partials: [Partials.Message]
+        intents: [
+            'Guilds',
+            'GuildMessages',
+            'MessageContent',
+            'GuildMessageReactions',
+            'DirectMessageReactions'
+        ],
+        partials: [Partials.Message, Partials.Reaction]
     }),
     {
         commands: new Collection<string, ApplicationCommand>(),
@@ -56,7 +62,7 @@ for (const file of msgCommandFiles) {
         client.msgCommands.set(command.default.name, command.default);
     } else {
         for (const cmd of command.commands) {
-            client.msgCommands.set(cmd.data.name, cmd);
+            client.msgCommands.set(cmd.name, cmd);
         }
     }
 }

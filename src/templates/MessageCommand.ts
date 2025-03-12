@@ -23,7 +23,7 @@ export default class MessageCommand extends BaseCommand {
         name: string;
         description: string;
         aliases?: string[];
-        execute: (message: Message, args: string[]) => Promise<void> | void;
+        execute: (message: Message, args: string[]) => any;
     }) {
         super(options);
         this.execute = options.execute;
